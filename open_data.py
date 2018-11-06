@@ -156,8 +156,16 @@ def main():
 
 	# create a database connection
 	conn = create_connection(database)
-	graph_margins_over_playoffs(conn, 2016, 2018)
+	graph_scores_over_scores(conn, 2016, 2018)
+	# graph_margins_over_playoffs(conn, 2016, 2018)
 
+
+def graph_scores_over_scores(conn, season_min, season_max):
+	cur = conn.cursor()
+	cur.execute("SELECT score1 score2 from games where season > {0} and season <= {1};".format(season_min, season_max))
+	rows = cur.fetchall()
+	for row in row:
+		print(row)
 
 
 def graph_margins_over_playoffs(conn, season_min, season_max):
