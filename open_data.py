@@ -131,8 +131,8 @@ def graph_multi_year_data(teams_list, margins_list, positions_list, seasons_list
 			margins_list[i],
 			positions_list[i],
 			c=colors[i],
-			# alpha=0.6,
-			label=info_label
+			label=info_label,
+			s=2
 		)
 		# [plt.text(margins_list[i][j], positions_list[i][j], teams_list[i][j]) for j in range(len(teams_list[i]))]  # add labels
 
