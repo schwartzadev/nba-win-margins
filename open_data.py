@@ -88,9 +88,10 @@ def main():
 	conn = create_connection(database)
 	with conn:
 		team = "GSW"
-		print(get_playoff_position(conn, team, 2015))
-		# rows = get_team_games(conn, team, 2017)
-		# get_winning_margins(rows, team)
+		season = 2017
+		print("playoff position: ", get_playoff_position(conn, team, season))
+		rows = get_team_games(conn, team, season)
+		get_winning_margins(rows, team)
 
 
 if __name__ == '__main__':
