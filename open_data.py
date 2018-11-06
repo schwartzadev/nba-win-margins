@@ -156,16 +156,35 @@ def main():
 
 	# create a database connection
 	conn = create_connection(database)
-	graph_scores_over_scores(conn, 2016, 2018)
+	graph_scores_over_scores(conn, 1970, 2018)
 	# graph_margins_over_playoffs(conn, 2016, 2018)
 
 
-def graph_scores_over_scores(conn, season_min, season_max):
+def get_scores_over_scores(conn, season_min, season_max):
 	cur = conn.cursor()
-	cur.execute("SELECT score1 score2 from games where season > {0} and season <= {1};".format(season_min, season_max))
+	cur.execute("SELECT score1, score2 from games where season > {0} and season <= {1};".format(season_min, season_max))
 	rows = cur.fetchall()
-	for row in row:
-		print(row)
+	home_scores = [row[0] for row in rows]
+	away_scores = [row[1] for row in rows]
+	return {'home': home_scores, 'away': away_scores}
+
+
+def graph_scores_over_scores(conn, season_min, season_max):
+	scores_dict = get_scores_over_scores(conn, season_min, season_max)
+	fig, ax = plt.subplots()
+	ax.scatter(
+		scores_dict['home'],
+		scores_dict['away'],
+		s=2,
+		alpha=0.01
+	)
+
+	plt.xlim(50, 150)
+	plt.ylim(50, 150)
+	plt.title("Home Scores vs. Away Scores ({0}-{1})".format(season_min, season_max))
+	plt.ylabel("Away")
+	plt.xlabel("Home")
+	plt.show()
 
 
 def graph_margins_over_playoffs(conn, season_min, season_max):
