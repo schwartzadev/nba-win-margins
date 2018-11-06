@@ -57,12 +57,12 @@ def get_winning_margins(rows, team):
 			win_count += 1
 			margin = abs(score1 - score2)
 			cume_margin += margin
-	print("games played:     ", games_count)
-	print("wins:             ", win_count)
-	print("losses (not wins):", games_count - win_count)
-	print("total margin:     ", cume_margin)
-	print("margin per game:  ", round(cume_margin/games_count, 2))
-	print("margin per win:   ", round(cume_margin/win_count, 2))
+	# print("games played:     ", games_count)
+	# print("wins:             ", win_count)
+	# print("losses (not wins):", games_count - win_count)
+	# print("total margin:     ", cume_margin)
+	# print("margin per game:  ", round(cume_margin/games_count, 2))
+	# print("margin per win:   ", round(cume_margin/win_count, 2))
 	return cume_margin/games_count  # margin per game
 
 
@@ -115,11 +115,11 @@ def main():
 				margins_to_graph.append(margin)
 				playoff_pos = get_playoff_position(conn, team, season)
 				playoff_postions.append(playoff_pos)
-				print("playoff position: ", playoff_pos)
-				print("========================")
-	print(teams_to_graph)
-	print(margins_to_graph)
-	print(playoff_postions)
+				# print("playoff position: ", playoff_pos)
+				# print("========================")
+	# print(teams_to_graph)
+	# print(margins_to_graph)
+	# print(playoff_postions)
 	graph_team_data(teams_to_graph, margins_to_graph, playoff_postions, season)
 
 
