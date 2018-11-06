@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from adjustText import adjust_text
 import numpy as np
 from scipy import stats
+from scipy import array
 
 
 teams = [
@@ -29,12 +30,8 @@ def get_team_games(conn, team, season):
 	cur = conn.cursor()
 	cur.execute("SELECT team1, team2, score1, score2 from games where playoff IS NULL and season = {0} and (team1 = '{1}' OR team2 = '{1}');".format(str(season), team))
 	rows = cur.fetchall()
-	# for row in rows:
-		# print(row)
 	if len(rows) == 0:
 		return None
-	print("team:             ", team)
-	# print("season:           ", season)
 	return rows
 
 
@@ -72,7 +69,6 @@ def get_winning_margins(rows, team):
 
 def get_playoff_position(conn, team, season):
 	# todo add marker (5) for champion
-	# todo handle 't' value in playoff field
 	cur = conn.cursor()
 	cur.execute("SELECT DISTINCT playoff from games where playoff IS NOT NULL and season = {0} and (team1 = '{1}' OR team2 = '{1}');".format(str(season), team))
 	rows = cur.fetchall()
@@ -86,6 +82,9 @@ def get_playoff_position(conn, team, season):
 		return 2  # made semifinals (round of 8)
 	if any([row[0] == 'q' for row in rows]):  # quarters
 		return 1  # made quarterfinals (round of 16)
+	if any([row[0] == 't' for row in rows]):  # not sure what this is
+		# todo ID WHAT THIS IS
+		return 3.5   # ???s
 	return rows
 
 
@@ -104,27 +103,45 @@ def graph_team_data(teams, margins, positions, season):
 	plt.show()
 
 
+def generate_color_list(count):
+	c = 45
+	m = 59
+	y = 0
+
+	chg = 100/count
+	k = 0
+
+	color_list = []
+	for c in range(0, count):
+		k += chg
+		r = (1 - c/100) * (1 - k/100)
+		g = (1 - m/100) * (1 - k/100)
+		b = (1 - y/100) * (1 - k/100)
+
+		color_list.append((abs(round(r, 8)), abs(round(g, 8)), abs(round(b, 8))))
+	return color_list
+
+
 def graph_multi_year_data(teams_list, margins_list, positions_list, seasons_list):
-	fig, ax = plt.subplots()
-	# fig, ax = plt.subplots(figsize=(18,9))
-	colors = ['b', 'g', 'r', 'c', 'm', 'y']
+	fig, ax = plt.subplots(figsize=(18,9))
+	colors = generate_color_list(len(seasons_list))
 	for i in range(0, len(seasons_list)):
-		label = seasons_list[i]
+		info_label = str(seasons_list[i]) + ' season'
 		ax.scatter(
 			margins_list[i],
 			positions_list[i],
 			c=colors[i],
-			alpha=0.6,
-			label=seasons_list[i]
+			# alpha=0.6,
+			label=info_label
 		)
-		[plt.text(margins_list[i][j], positions_list[i][j], teams_list[i][j]) for j in range(len(teams_list[i]))]  # add labels
+		# [plt.text(margins_list[i][j], positions_list[i][j], teams_list[i][j]) for j in range(len(teams_list[i]))]  # add labels
 
 		gradient, intercept, r_value, p_value, std_err = stats.linregress(margins_list[i], positions_list[i])
 		mn = np.min(margins_list[i])
 		mx = np.max(margins_list[i])
 		x1 = np.linspace(mn, mx, 500)
 		y1 = gradient * x1 + intercept
-		plt.plot(x1, y1, colors[i])
+		plt.plot(x1, y1, c=colors[i])
 
 
 	plt.legend(loc='upper left')
@@ -139,7 +156,7 @@ def main():
 
 	# create a database connection
 	conn = create_connection(database)
-	season_min = 2017
+	season_min = 1990
 	season_max = 2018
 	teams_list = []
 	margins_list = []
@@ -150,7 +167,7 @@ def main():
 			teams_to_graph = []
 			margins_to_graph = []
 			playoff_postions = []
-			print('in season ', season, '...')
+			print('in season', season, '...')
 			for team in teams:
 				rows = get_team_games(conn, team, season)
 				if rows is not None:
