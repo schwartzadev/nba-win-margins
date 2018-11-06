@@ -61,7 +61,13 @@ def get_winning_margins(rows, team):
 	print("margin per game:  ", round(cume_margin/games_count, 2))
 	print("margin per win:   ", round(cume_margin/win_count, 2))
 
-		# print("[{0} vs. {1}] winner: {2} (by {3} points)".format(row[0], row[1], row[0+winner], margin))
+
+def get_playoff_position(conn, team, season):
+	cur = conn.cursor()
+	cur.execute("SELECT playoff where playoff IS NOT NULL and season = {0} and (team1 = '{1}' OR team2 = '{1}') UNIQUE (playoff);".format(str(season), team))
+	rows = cur.fetchall()
+	print(rows)
+	return rows
 
 
 def main():
@@ -71,8 +77,9 @@ def main():
 	conn = create_connection(database)
 	with conn:
 		team = "LAL"
-		rows = get_team_games(conn, team, 2017)
-		get_winning_margins(rows, team)
+		get_playoff_position(conn, team, 2017)
+		# rows = get_team_games(conn, team, 2017)
+		# get_winning_margins(rows, team)
 
 
 if __name__ == '__main__':
