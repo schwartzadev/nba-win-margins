@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 import matplotlib.pyplot as plt
+from adjustText import adjust_text
+
 
 teams = [
 	"ANA", "AND", "ATL", "BAL", "BLB", "BOS", "BRK", "BUF", "CAP", "CAR", "CHH", "CHI", "CHO", "CHP", "CHS", "CHZ", "CIN", "CLE", "CLR",
@@ -30,7 +32,7 @@ def get_team_games(conn, team, season):
 	if len(rows) == 0:
 		return None
 	print("team:             ", team)
-	print("season:           ", season)
+	# print("season:           ", season)
 	return rows
 
 
@@ -86,10 +88,13 @@ def get_playoff_position(conn, team, season):
 
 
 def graph_team_data(teams, margins, positions, season):
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(20,10))
 	ax.scatter(margins, positions, alpha=0.4)
 	# texts = [plt.text(margins[i], positions[i], teams[i], ha='center', va='center') for i in range(len(teams))]
 	texts = [plt.text(margins[i], positions[i], teams[i]) for i in range(len(teams))]
+	print('adjusting labels...')
+	adjust_text(texts)
+
 
 	plt.title("Average Point Win Margin vs. Playoff Postions ({0})".format(season))
 	plt.ylabel("Playoff Value*")
@@ -107,7 +112,7 @@ def main():
 	playoff_postions = []
 	season = 2018
 	with conn:
-		for team in teams[:10]:
+		for team in teams:
 			rows = get_team_games(conn, team, season)
 			if rows is not None:
 				margin = get_winning_margins(rows, team)
