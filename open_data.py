@@ -164,8 +164,8 @@ def get_scores_over_scores(conn, season_min, season_max):
 	cur = conn.cursor()
 	cur.execute("SELECT score1, score2 from games where season > {0} and season <= {1};".format(season_min, season_max))
 	rows = cur.fetchall()
-	home_scores = [row[0] for row in rows]
-	away_scores = [row[1] for row in rows]
+	home_scores = [int(row[0]) for row in rows]
+	away_scores = [int(row[1]) for row in rows]
 	return {'home': home_scores, 'away': away_scores}
 
 
