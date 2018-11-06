@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import matplotlib.pyplot as plt
 
 teams = [
 	"ANA", "AND", "ATL", "BAL", "BLB", "BOS", "BRK", "BUF", "CAP", "CAR", "CHH", "CHI", "CHO", "CHP", "CHS", "CHZ", "CIN", "CLE", "CLR",
@@ -26,6 +27,8 @@ def get_team_games(conn, team, season):
 	rows = cur.fetchall()
 	# for row in rows:
 		# print(row)
+	if len(rows) == 0:
+		return None
 	print("team:             ", team)
 	print("season:           ", season)
 	return rows
@@ -60,6 +63,7 @@ def get_winning_margins(rows, team):
 	print("total margin:     ", cume_margin)
 	print("margin per game:  ", round(cume_margin/games_count, 2))
 	print("margin per win:   ", round(cume_margin/win_count, 2))
+	return cume_margin/games_count  # margin per game
 
 
 def get_playoff_position(conn, team, season):
@@ -81,17 +85,42 @@ def get_playoff_position(conn, team, season):
 	return rows
 
 
+def graph_team_data(teams, margins, positions, season):
+	fig, ax = plt.subplots()
+	ax.scatter(margins, positions, alpha=0.4)
+	# texts = [plt.text(margins[i], positions[i], teams[i], ha='center', va='center') for i in range(len(teams))]
+	texts = [plt.text(margins[i], positions[i], teams[i]) for i in range(len(teams))]
+
+	plt.title("Average Point Win Margin vs. Playoff Postions ({0})".format(season))
+	plt.ylabel("Playoff Value*")
+	plt.xlabel("Avg. Win Margin")
+	plt.show()
+
+
 def main():
 	database = "C:\\Users\\werdn\\Documents\\NBA-math-IA\\nba-data.db"
 
 	# create a database connection
 	conn = create_connection(database)
+	teams_to_graph = []
+	margins_to_graph = []
+	playoff_postions = []
+	season = 2018
 	with conn:
-		team = "GSW"
-		season = 2017
-		print("playoff position: ", get_playoff_position(conn, team, season))
-		rows = get_team_games(conn, team, season)
-		get_winning_margins(rows, team)
+		for team in teams[:10]:
+			rows = get_team_games(conn, team, season)
+			if rows is not None:
+				margin = get_winning_margins(rows, team)
+				teams_to_graph.append(team)
+				margins_to_graph.append(margin)
+				playoff_pos = get_playoff_position(conn, team, season)
+				playoff_postions.append(playoff_pos)
+				print("playoff position: ", playoff_pos)
+				print("========================")
+	print(teams_to_graph)
+	print(margins_to_graph)
+	print(playoff_postions)
+	graph_team_data(teams_to_graph, margins_to_graph, playoff_postions, season)
 
 
 if __name__ == '__main__':
