@@ -63,10 +63,21 @@ def get_winning_margins(rows, team):
 
 
 def get_playoff_position(conn, team, season):
+	# todo add marker (5) for champion
+	# todo handle 't' value in playoff field
 	cur = conn.cursor()
-	cur.execute("SELECT playoff where playoff IS NOT NULL and season = {0} and (team1 = '{1}' OR team2 = '{1}') UNIQUE (playoff);".format(str(season), team))
+	cur.execute("SELECT DISTINCT playoff from games where playoff IS NOT NULL and season = {0} and (team1 = '{1}' OR team2 = '{1}');".format(str(season), team))
 	rows = cur.fetchall()
-	print(rows)
+	if len(rows) == 0:
+		return 0  # did not make playoffs
+	if any([row[0] == 'f' for row in rows]):  # finals
+		return 4  # made finals (round of 2)
+	if any([row[0] == 'c' for row in rows]):  # conference
+		return 3  # made conference (round of 4)
+	if any([row[0] == 's' for row in rows]):  # semis
+		return 2  # made semifinals (round of 8)
+	if any([row[0] == 'q' for row in rows]):  # quarters
+		return 1  # made quarterfinals (round of 16)
 	return rows
 
 
@@ -76,8 +87,8 @@ def main():
 	# create a database connection
 	conn = create_connection(database)
 	with conn:
-		team = "LAL"
-		get_playoff_position(conn, team, 2017)
+		team = "GSW"
+		print(get_playoff_position(conn, team, 2015))
 		# rows = get_team_games(conn, team, 2017)
 		# get_winning_margins(rows, team)
 
