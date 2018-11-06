@@ -123,7 +123,7 @@ def generate_color_list(count):
 
 
 def graph_multi_year_data(teams_list, margins_list, positions_list, seasons_list):
-	fig, ax = plt.subplots(figsize=(18,9))
+	fig, ax = plt.subplots()
 	colors = generate_color_list(len(seasons_list))
 	for i in range(0, len(seasons_list)):
 		info_label = str(seasons_list[i]) + ' season'
