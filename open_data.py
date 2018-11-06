@@ -26,6 +26,8 @@ def get_team_games(conn, team, season):
 	rows = cur.fetchall()
 	# for row in rows:
 		# print(row)
+	print("team:             ", team)
+	print("season:           ", season)
 	return rows
 
 
@@ -44,16 +46,20 @@ def get_winning_margins(rows, team):
 		elif score1 > score2:
 			winner = team1
 			# print("    {} with {} points".format(team1, score1))
+		else:
+			print("TIED!!!")
 
 		if winner == team:
 			# if the provided team won the game...
 			win_count += 1
 			margin = abs(score1 - score2)
 			cume_margin += margin
-	print("games played", games_count)
-	print("wins", win_count)
-	print("losses (not wins)", games_count - win_count)
-	print("total margin", cume_margin)
+	print("games played:     ", games_count)
+	print("wins:             ", win_count)
+	print("losses (not wins):", games_count - win_count)
+	print("total margin:     ", cume_margin)
+	print("margin per game:  ", round(cume_margin/games_count, 2))
+	print("margin per win:   ", round(cume_margin/win_count, 2))
 
 		# print("[{0} vs. {1}] winner: {2} (by {3} points)".format(row[0], row[1], row[0+winner], margin))
 
@@ -64,8 +70,8 @@ def main():
 	# create a database connection
 	conn = create_connection(database)
 	with conn:
-		team = "OKC"
-		rows = get_team_games(conn, team, 2018)
+		team = "LAL"
+		rows = get_team_games(conn, team, 2017)
 		get_winning_margins(rows, team)
 
 
