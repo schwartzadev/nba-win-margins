@@ -156,8 +156,11 @@ def main():
 
 	# create a database connection
 	conn = create_connection(database)
-	season_min = 1990
-	season_max = 2018
+	graph_margins_over_playoffs(conn, 2016, 2018)
+
+
+
+def graph_margins_over_playoffs(conn, season_min, season_max):
 	teams_list = []
 	margins_list = []
 	playoff_positions_list = []
@@ -183,7 +186,6 @@ def main():
 			playoff_positions_list.append(playoff_postions)
 			seasons_list.append(season)
 	graph_multi_year_data(teams_list, margins_list, playoff_positions_list, seasons_list)
-
 
 if __name__ == '__main__':
 	main()
